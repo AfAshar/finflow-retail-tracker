@@ -4,8 +4,20 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Save, FileText, CheckCircle, ChevronDown, ChevronRight, Search, Users, DollarSign, Building, TrendingUp } from 'lucide-react';
+import { Disclosure } from '@headlessui/react';
+import { 
+  DocumentCheckIcon, 
+  DocumentTextIcon, 
+  CheckCircleIcon, 
+  ChevronDownIcon, 
+  ChevronRightIcon, 
+  MagnifyingGlassIcon, 
+  UsersIcon, 
+  CurrencyDollarIcon, 
+  BuildingOfficeIcon, 
+  ArrowTrendingUpIcon,
+  ComputerDesktopIcon
+} from '@heroicons/react/24/outline';
 
 interface MonthData {
   month: string;
@@ -191,28 +203,28 @@ const mockData: FinanceData = {
 const categoryConfig = {
   headcount: { 
     label: 'Human Resources', 
-    icon: Users, 
+    icon: UsersIcon, 
     color: 'text-blue-600',
     bgColor: 'bg-blue-50',
     borderColor: 'border-blue-200'
   },
   operational: { 
     label: 'Operational Expenses', 
-    icon: Building, 
+    icon: BuildingOfficeIcon, 
     color: 'text-green-600',
     bgColor: 'bg-green-50',
     borderColor: 'border-green-200'
   },
   technology: { 
     label: 'Technology & Infrastructure', 
-    icon: TrendingUp, 
+    icon: ComputerDesktopIcon, 
     color: 'text-purple-600',
     bgColor: 'bg-purple-50',
     borderColor: 'border-purple-200'
   },
   marketing: { 
     label: 'Marketing & Sales', 
-    icon: DollarSign, 
+    icon: CurrencyDollarIcon, 
     color: 'text-orange-600',
     bgColor: 'bg-orange-50',
     borderColor: 'border-orange-200'
@@ -317,7 +329,7 @@ export function FinanceTracker() {
           
           <div className="flex items-center gap-4 w-full lg:w-auto">
             <div className="relative flex-1 lg:flex-none lg:w-80">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
                 placeholder="Search fields..."
                 value={searchTerm}
@@ -332,12 +344,12 @@ export function FinanceTracker() {
             >
               {data.status === 'draft' ? (
                 <>
-                  <FileText className="w-3 h-3 mr-1" />
+                  <DocumentTextIcon className="w-3 h-3 mr-1" />
                   Draft
                 </>
               ) : (
                 <>
-                  <CheckCircle className="w-3 h-3 mr-1" />
+                  <CheckCircleIcon className="w-3 h-3 mr-1" />
                   Submitted
                 </>
               )}
@@ -345,7 +357,7 @@ export function FinanceTracker() {
             
             {isEditable && (
               <Button variant="primary" className="bg-gradient-to-r from-primary to-primary-glow">
-                <Save className="w-4 h-4 mr-2" />
+                <DocumentCheckIcon className="w-4 h-4 mr-2" />
                 Save Changes
               </Button>
             )}
@@ -379,150 +391,159 @@ export function FinanceTracker() {
         <div className="space-y-6">
           {Object.entries(filteredFields).map(([category, fields]) => {
             const config = categoryConfig[category as keyof typeof categoryConfig];
-            const Icon = config?.icon || Building;
+            const Icon = config?.icon || BuildingOfficeIcon;
             const isOpen = openSections[category];
             
             return (
               <Card key={category} className="shadow-card border-0 bg-card/50 backdrop-blur-sm">
-                <Collapsible open={isOpen} onOpenChange={() => toggleSection(category)}>
-                  <CollapsibleTrigger asChild>
-                    <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <Icon className={`w-6 h-6 ${config?.color || 'text-muted-foreground'}`} />
-                          <CardTitle className="text-xl">
-                            {config?.label || category}
-                          </CardTitle>
-                          <Badge variant="outline" className="text-xs">
-                            {fields.length} fields
-                          </Badge>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg font-bold text-success">
-                            {formatCurrency(calculateCategoryTotal(category))}
-                          </span>
-                          {isOpen ? (
-                            <ChevronDown className="w-5 h-5 text-muted-foreground" />
-                          ) : (
-                            <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                          )}
-                        </div>
-                      </div>
-                    </CardHeader>
-                  </CollapsibleTrigger>
-                  
-                  <CollapsibleContent>
-                    <CardContent className="pt-0 space-y-6">
-                      {fields.map((field) => (
-                        <div key={field.fieldKey} className="border border-border/50 rounded-lg p-4 bg-background/50">
-                          <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-semibold text-foreground">
-                              {formatFieldName(field.fieldKey)}
-                            </h3>
-                            {field.grouped && (
-                              <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/20">
-                                Headcount & Salary
+                <Disclosure>
+                  {({ open }) => (
+                    <>
+                      <Disclosure.Button 
+                        onClick={() => toggleSection(category)}
+                        className="w-full"
+                      >
+                        <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <Icon className={`w-6 h-6 ${config?.color || 'text-muted-foreground'}`} />
+                              <CardTitle className="text-xl">
+                                {config?.label || category}
+                              </CardTitle>
+                              <Badge variant="outline" className="text-xs">
+                                {fields.length} fields
                               </Badge>
-                            )}
-                          </div>
-                          
-                          {field.grouped ? (
-                            /* Grouped fields with horizontal scroll table */
-                            <div className="overflow-x-auto">
-                              <div className="min-w-[1200px]">
-                                <div className="grid grid-cols-13 gap-1 text-xs font-medium text-muted-foreground mb-2 px-2">
-                                  <div>Month</div>
-                                  {MONTHS.map(month => (
-                                    <div key={month} className="text-center">
-                                      {formatMonthShort(month)}
-                                    </div>
-                                  ))}
-                                </div>
-                                
-                                {/* Head Count Row */}
-                                <div className="grid grid-cols-13 gap-1 mb-2">
-                                  <div className="text-sm font-medium text-foreground py-2 px-2">Head Count</div>
-                                  {field.months.map((month, monthIndex) => (
-                                    <div key={month.month} className="p-1">
-                                      {isEditable ? (
-                                        <Input
-                                          type="number"
-                                          value={month.head_count || 0}
-                                          onChange={(e) => updateFieldValue(field.index, monthIndex, 'head_count', parseInt(e.target.value) || 0)}
-                                          className="h-8 text-xs text-center border-input-border bg-input"
-                                        />
-                                      ) : (
-                                        <div className="h-8 flex items-center justify-center text-xs bg-muted rounded text-foreground">
-                                          {month.head_count || 0}
-                                        </div>
-                                      )}
-                                    </div>
-                                  ))}
-                                </div>
-                                
-                                {/* Salary Row */}
-                                <div className="grid grid-cols-13 gap-1 mb-2">
-                                  <div className="text-sm font-medium text-foreground py-2 px-2">Salary</div>
-                                  {field.months.map((month, monthIndex) => (
-                                    <div key={month.month} className="p-1">
-                                      {isEditable ? (
-                                        <Input
-                                          type="number"
-                                          value={month.salary || 0}
-                                          onChange={(e) => updateFieldValue(field.index, monthIndex, 'salary', parseInt(e.target.value) || 0)}
-                                          className="h-8 text-xs text-center border-input-border bg-input"
-                                        />
-                                      ) : (
-                                        <div className="h-8 flex items-center justify-center text-xs bg-muted rounded text-foreground">
-                                          {formatCurrency(month.salary || 0)}
-                                        </div>
-                                      )}
-                                    </div>
-                                  ))}
-                                </div>
-                                
-                                {/* Total Row */}
-                                <div className="grid grid-cols-13 gap-1 border-t border-border/50 pt-2">
-                                  <div className="text-sm font-bold text-success py-2 px-2">Total</div>
-                                  {field.months.map((month) => (
-                                    <div key={month.month} className="p-1">
-                                      <div className="h-8 flex items-center justify-center text-xs font-bold text-success bg-success/10 rounded border border-success/20">
-                                        {formatCurrency(month.value).replace('$', '').replace(',', 'K').slice(0, -3) + 'K'}
-                                      </div>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
                             </div>
-                          ) : (
-                            /* Single input fields - responsive grid */
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
-                              {field.months.map((month, monthIndex) => (
-                                <div key={month.month} className="space-y-2">
-                                  <label className="text-xs font-medium text-muted-foreground capitalize">
-                                    {formatMonthShort(month.month)}
-                                  </label>
-                                  {isEditable ? (
-                                    <Input
-                                      type="number"
-                                      value={month.value}
-                                      onChange={(e) => updateFieldValue(field.index, monthIndex, 'value', parseInt(e.target.value) || 0)}
-                                      className="h-9 text-sm border-input-border bg-input"
-                                    />
-                                  ) : (
-                                    <div className="h-9 flex items-center justify-center text-sm bg-muted rounded text-foreground font-medium">
-                                      {formatCurrency(month.value)}
-                                    </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-lg font-bold text-success">
+                                {formatCurrency(calculateCategoryTotal(category))}
+                              </span>
+                              {isOpen ? (
+                                <ChevronDownIcon className="w-5 h-5 text-muted-foreground" />
+                              ) : (
+                                <ChevronRightIcon className="w-5 h-5 text-muted-foreground" />
+                              )}
+                            </div>
+                          </div>
+                        </CardHeader>
+                      </Disclosure.Button>
+                      
+                      {isOpen && (
+                        <Disclosure.Panel static>
+                          <CardContent className="pt-0 space-y-6">
+                            {fields.map((field) => (
+                              <div key={field.fieldKey} className="border border-border/50 rounded-lg p-4 bg-background/50">
+                                <div className="flex items-center justify-between mb-4">
+                                  <h3 className="text-lg font-semibold text-foreground">
+                                    {formatFieldName(field.fieldKey)}
+                                  </h3>
+                                  {field.grouped && (
+                                    <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/20">
+                                      Headcount & Salary
+                                    </Badge>
                                   )}
                                 </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </CardContent>
-                  </CollapsibleContent>
-                </Collapsible>
+                                
+                                {field.grouped ? (
+                                  /* Grouped fields with horizontal scroll table */
+                                  <div className="overflow-x-auto">
+                                    <div className="min-w-[1200px]">
+                                      <div className="grid grid-cols-13 gap-1 text-xs font-medium text-muted-foreground mb-2 px-2">
+                                        <div>Month</div>
+                                        {MONTHS.map(month => (
+                                          <div key={month} className="text-center">
+                                            {formatMonthShort(month)}
+                                          </div>
+                                        ))}
+                                      </div>
+                                      
+                                      {/* Head Count Row */}
+                                      <div className="grid grid-cols-13 gap-1 mb-2">
+                                        <div className="text-sm font-medium text-foreground py-2 px-2">Head Count</div>
+                                        {field.months.map((month, monthIndex) => (
+                                          <div key={month.month} className="p-1">
+                                            {isEditable ? (
+                                              <Input
+                                                type="number"
+                                                value={month.head_count || 0}
+                                                onChange={(e) => updateFieldValue(field.index, monthIndex, 'head_count', parseInt(e.target.value) || 0)}
+                                                className="h-8 text-xs text-center border-input-border bg-input"
+                                              />
+                                            ) : (
+                                              <div className="h-8 flex items-center justify-center text-xs bg-muted rounded text-foreground">
+                                                {month.head_count || 0}
+                                              </div>
+                                            )}
+                                          </div>
+                                        ))}
+                                      </div>
+                                      
+                                      {/* Salary Row */}
+                                      <div className="grid grid-cols-13 gap-1 mb-2">
+                                        <div className="text-sm font-medium text-foreground py-2 px-2">Salary</div>
+                                        {field.months.map((month, monthIndex) => (
+                                          <div key={month.month} className="p-1">
+                                            {isEditable ? (
+                                              <Input
+                                                type="number"
+                                                value={month.salary || 0}
+                                                onChange={(e) => updateFieldValue(field.index, monthIndex, 'salary', parseInt(e.target.value) || 0)}
+                                                className="h-8 text-xs text-center border-input-border bg-input"
+                                              />
+                                            ) : (
+                                              <div className="h-8 flex items-center justify-center text-xs bg-muted rounded text-foreground">
+                                                {formatCurrency(month.salary || 0)}
+                                              </div>
+                                            )}
+                                          </div>
+                                        ))}
+                                      </div>
+                                      
+                                      {/* Total Row */}
+                                      <div className="grid grid-cols-13 gap-1 border-t border-border/50 pt-2">
+                                        <div className="text-sm font-bold text-success py-2 px-2">Total</div>
+                                        {field.months.map((month) => (
+                                          <div key={month.month} className="p-1">
+                                            <div className="h-8 flex items-center justify-center text-xs font-bold text-success bg-success/10 rounded border border-success/20">
+                                              {formatCurrency(month.value).replace('$', '').replace(',', 'K').slice(0, -3) + 'K'}
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  /* Single input fields - responsive grid */
+                                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+                                    {field.months.map((month, monthIndex) => (
+                                      <div key={month.month} className="space-y-2">
+                                        <label className="text-xs font-medium text-muted-foreground capitalize">
+                                          {formatMonthShort(month.month)}
+                                        </label>
+                                        {isEditable ? (
+                                          <Input
+                                            type="number"
+                                            value={month.value}
+                                            onChange={(e) => updateFieldValue(field.index, monthIndex, 'value', parseInt(e.target.value) || 0)}
+                                            className="h-9 text-sm border-input-border bg-input"
+                                          />
+                                        ) : (
+                                          <div className="h-9 flex items-center justify-center text-sm bg-muted rounded text-foreground font-medium">
+                                            {formatCurrency(month.value)}
+                                          </div>
+                                        )}
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </CardContent>
+                        </Disclosure.Panel>
+                      )}
+                    </>
+                  )}
+                </Disclosure>
               </Card>
             );
           })}
@@ -532,7 +553,7 @@ export function FinanceTracker() {
         <Card className="shadow-card border-0 bg-gradient-to-br from-card to-muted/20">
           <CardHeader>
             <CardTitle className="text-success flex items-center gap-2">
-              <TrendingUp className="w-5 h-5" />
+              <ArrowTrendingUpIcon className="w-5 h-5" />
               Annual Financial Summary
             </CardTitle>
           </CardHeader>
